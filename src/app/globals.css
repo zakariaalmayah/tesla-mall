@@ -1,0 +1,146 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Tesla Mall — design tokens
+ * Light mode: white base, gold accent, ink text
+ * Dark mode: near-black base, same gold accent (brighter for contrast)
+ */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 6% 6%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 6% 6%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 6% 6%;
+
+    --primary: 42 39% 53%; /* gold-500 #C6A048 */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 6% 6%; /* ink-900 */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 40%;
+
+    --accent: 42 45% 90%;
+    --accent-foreground: 42 39% 20%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 71% 35%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 10%;
+
+    --border: 240 5% 90%;
+    --input: 240 5% 90%;
+    --ring: 42 39% 53%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 240 8% 4%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 7% 7%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 7% 7%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 42 55% 62%; /* brighter gold for dark backgrounds */
+    --primary-foreground: 240 8% 6%;
+
+    --secondary: 0 0% 98%;
+    --secondary-foreground: 240 8% 6%;
+
+    --muted: 240 5% 14%;
+    --muted-foreground: 240 5% 65%;
+
+    --accent: 42 30% 16%;
+    --accent-foreground: 42 55% 80%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 98%;
+
+    --success: 142 60% 42%;
+    --success-foreground: 0 0% 98%;
+
+    --warning: 38 85% 55%;
+    --warning-foreground: 0 0% 10%;
+
+    --border: 240 6% 16%;
+    --input: 240 6% 16%;
+    --ring: 42 55% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+
+  [dir="rtl"] body {
+    @apply font-cairo;
+  }
+
+  [dir="ltr"] body {
+    @apply font-inter;
+  }
+
+  ::selection {
+    @apply bg-gold-200 text-ink-900;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .gold-text {
+    @apply bg-gold-gradient bg-clip-text text-transparent;
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
