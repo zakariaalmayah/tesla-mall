@@ -63,17 +63,29 @@ export async function addToCartAction(input: AddToCartInput): Promise<CartAction
 
   const cartId = await getOrCreateCartId(session.user.id);
 
-  await prisma.cartItem.upsert({
+  const existingItem = await prisma.cartItem.findFirst({
     where: {
-      cartId_productId_variantId: {
+      cartId,
+      productId,
+      variantId: variantId ?? null,
+    },
+  });
+
+  if (existingItem) {
+    await prisma.cartItem.update({
+      where: { id: existingItem.id },
+      data: { quantity: { increment: quantity } },
+    });
+  } else {
+    await prisma.cartItem.create({
+      data: {
         cartId,
         productId,
         variantId: variantId ?? null,
+        quantity,
       },
-    },
-    create: { cartId, productId, variantId: variantId ?? null, quantity },
-    update: { quantity: { increment: quantity } },
-  });
+    });
+  }
 
   revalidatePath("/cart");
 

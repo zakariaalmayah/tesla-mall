@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
+import { useParams } from "next/navigation";
 import { usePathname, useRouter } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
@@ -8,9 +9,14 @@ export function LocaleSwitcher({ variant = "default" }: { variant?: "default" | 
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
+  const params = useParams();
 
   function switchTo(nextLocale: "ar" | "en") {
-    router.replace(pathname, { locale: nextLocale });
+    router.replace(
+      // @ts-expect-error -- locale switcher is generic and does not have compile-time knowledge of specific route parameters
+      { pathname, params },
+      { locale: nextLocale }
+    );
   }
 
   return (

@@ -12,8 +12,6 @@ export interface GalleryMedia {
 
 export function ProductGallery({ media, fallbackAlt }: { media: GalleryMedia[]; fallbackAlt: string }) {
   const [activeIndex, setActiveIndex] = React.useState(0);
-  const active = media[activeIndex];
-
   if (media.length === 0) {
     return (
       <div className="flex aspect-square items-center justify-center rounded-2xl bg-muted text-muted-foreground">
@@ -21,6 +19,8 @@ export function ProductGallery({ media, fallbackAlt }: { media: GalleryMedia[]; 
       </div>
     );
   }
+
+  const active = media[activeIndex] ?? media[0]!;
 
   return (
     <div className="flex flex-col gap-3 sm:flex-row-reverse">

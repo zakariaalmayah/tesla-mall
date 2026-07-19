@@ -34,8 +34,7 @@ async function main() {
 
   // ── Categories ───────────────────────────────────────────────────────
   const categoryMap = new Map<string, string>();
-  for (let i = 0; i < CATEGORIES.length; i++) {
-    const c = CATEGORIES[i];
+  for (const [i, c] of CATEGORIES.entries()) {
     const category = await prisma.category.upsert({
       where: { slug: c.slug },
       update: {},

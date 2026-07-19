@@ -59,6 +59,18 @@ export const routing = defineRouting({
       ar: "/الدفع/تأكيد/[orderNumber]",
       en: "/checkout/confirmation/[orderNumber]",
     },
+    "/admin": "/admin",
+    "/admin/products": "/admin/products",
+    "/admin/products/new": "/admin/products/new",
+    "/admin/products/[id]/edit": "/admin/products/[id]/edit",
+    "/admin/orders": "/admin/orders",
+    "/admin/orders/[orderNumber]": "/admin/orders/[orderNumber]",
+    "/admin/categories": "/admin/categories",
+    "/admin/categories/new": "/admin/categories/new",
+    "/admin/categories/[id]/edit": "/admin/categories/[id]/edit",
+    "/admin/customers": "/admin/customers",
+    "/admin/inventory": "/admin/inventory",
+    "/admin/settings": "/admin/settings",
   },
 });
 

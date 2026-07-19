@@ -41,7 +41,7 @@ export default async function AdminLayout({
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={item.href as never}
                 className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
               >
                 <Icon className="size-4 text-muted-foreground" />
