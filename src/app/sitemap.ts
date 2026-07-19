@@ -3,17 +3,26 @@ import { prisma } from "@/lib/prisma";
 import { siteConfig } from "@/config/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, categories] = await Promise.all([
-    prisma.product.findMany({
-      where: { status: "ACTIVE" },
-      select: { slug: true, updatedAt: true },
-      take: 5000,
-    }),
-    prisma.category.findMany({
-      where: { isActive: true },
-      select: { slug: true, updatedAt: true },
-    }),
-  ]);
+  let products: { slug: string; updatedAt: Date }[] = [];
+  let categories: { slug: string; updatedAt: Date }[] = [];
+
+  try {
+    const [fetchedProducts, fetchedCategories] = await Promise.all([
+      prisma.product.findMany({
+        where: { status: "ACTIVE" },
+        select: { slug: true, updatedAt: true },
+        take: 5000,
+      }),
+      prisma.category.findMany({
+        where: { isActive: true },
+        select: { slug: true, updatedAt: true },
+      }),
+    ]);
+    products = fetchedProducts;
+    categories = fetchedCategories;
+  } catch (error) {
+    console.error("Failed to fetch database records for sitemap:", error);
+  }
 
   const staticRoutes: MetadataRoute.Sitemap = ["", "/products", "/about", "/contact"].map(
     (path) => ({
