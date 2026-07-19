@@ -3,7 +3,7 @@ import { z } from "zod";
 export const addressFormSchema = z.object({
   label: z.string().trim().min(1).max(40),
   fullName: z.string().trim().min(2).max(100),
-  phone: z.string().regex(/^\+?9677\d{8}$/, "رقم هاتف يمني غير صحيح"),
+  phone: z.string().regex(/^(?:\+?967|0)?7\d{8}$/, "رقم هاتف غير صحيح (مثال: 770288967)"),
   governorate: z.string().trim().min(1),
   city: z.string().trim().min(1),
   district: z.string().trim().max(100).optional().or(z.literal("")),

@@ -53,7 +53,7 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
         </div>
         <h1 className="mt-6 text-2xl font-bold sm:text-3xl">{t("orderSuccess")}</h1>
         <p className="mt-2 text-muted-foreground">{t("orderSuccessHint")}</p>
-        <p className="mt-4 rounded-full bg-secondary px-4 py-1.5 text-sm font-semibold">
+        <p className="mt-4 rounded-full bg-secondary text-secondary-foreground px-4 py-1.5 text-sm font-semibold">
           {t("orderNumber")}: {order.orderNumber}
         </p>
       </div>

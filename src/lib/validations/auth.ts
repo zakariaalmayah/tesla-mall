@@ -3,7 +3,7 @@ import { z } from "zod";
 const phoneSchema = z
   .string()
   .trim()
-  .regex(/^\+?9677\d{8}$/, "رقم هاتف يمني غير صحيح");
+  .regex(/^(?:\+?967|0)?7\d{8}$/, "رقم هاتف غير صحيح (مثال: 770288967)");
 
 export const loginSchema = z.object({
   phone: phoneSchema,

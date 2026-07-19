@@ -42,7 +42,7 @@ export default async function AdminLayout({
               <Link
                 key={item.href}
                 href={item.href as never}
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground"
               >
                 <Icon className="size-4 text-muted-foreground" />
                 {item.label}

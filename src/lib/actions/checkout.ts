@@ -23,12 +23,12 @@ export interface PlaceOrderResult {
   orderNumber?: string;
 }
 
+import { normalizePhone } from "@/lib/utils";
+
 export async function placeOrderAction(input: PlaceOrderInput): Promise<PlaceOrderResult> {
   const session = await auth();
-  if (!session?.user?.id) {
-    return { ok: false, error: "UNAUTHENTICATED" };
-  }
-  const userId = session.user.id;
+  let userId = session?.user?.id;
+  let cartUserId = userId;
 
   const parsed = placeOrderSchema.safeParse(input);
   if (!parsed.success) {
@@ -36,11 +36,41 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<PlaceOrd
   }
   const { addressId, newAddress, shippingMethod, customerNote } = parsed.data;
 
-  if (!addressId && !newAddress) {
-    return { ok: false, error: "NO_ADDRESS" };
+  if (!userId) {
+    // Guest checkout: must have a new address
+    if (!newAddress) {
+      return { ok: false, error: "NO_ADDRESS" };
+    }
+
+    const { cookies } = await import("next/headers");
+    const cookieStore = await cookies();
+    const guestUserIdCookie = cookieStore.get("guest_user_id")?.value;
+    if (!guestUserIdCookie) {
+      return { ok: false, error: "UNAUTHENTICATED" };
+    }
+    cartUserId = guestUserIdCookie;
+
+    // Resolve or create user by phone number
+    const phone = normalizePhone(newAddress.phone);
+    let user = await prisma.user.findUnique({ where: { phone } });
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          name: newAddress.fullName,
+          phone,
+          role: "CUSTOMER",
+        },
+      });
+    }
+    userId = user.id;
+  } else {
+    // Logged in user: must have either addressId or newAddress
+    if (!addressId && !newAddress) {
+      return { ok: false, error: "NO_ADDRESS" };
+    }
   }
 
-  const cart = await getCartForUser(userId);
+  const cart = await getCartForUser(cartUserId!);
   if (cart.items.length === 0) {
     return { ok: false, error: "EMPTY_CART" };
   }
@@ -72,7 +102,7 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<PlaceOrd
         userId,
         label: newAddress.label,
         fullName: newAddress.fullName,
-        phone: newAddress.phone.startsWith("+") ? newAddress.phone : `+${newAddress.phone}`,
+        phone: normalizePhone(newAddress.phone),
         governorate: newAddress.governorate,
         city: newAddress.city,
         district: newAddress.district || null,
@@ -188,6 +218,9 @@ export async function placeOrderAction(input: PlaceOrderInput): Promise<PlaceOrd
     if (cart.cartId) {
       await tx.cartItem.deleteMany({ where: { cartId: cart.cartId } });
     }
+  }, {
+    maxWait: 15000, // 15 seconds max wait to acquire connection
+    timeout: 30000, // 30 seconds transaction timeout
   });
 
   revalidatePath("/cart");

@@ -106,7 +106,7 @@ export default async function RootLayout({ children, params }: LocaleLayoutProps
 
   return (
     <html lang={locale} dir={dir} className={`${cairo.variable} ${inter.variable}`} suppressHydrationWarning>
-      <body>
+      <body suppressHydrationWarning>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <div className="relative flex min-h-dvh flex-col">

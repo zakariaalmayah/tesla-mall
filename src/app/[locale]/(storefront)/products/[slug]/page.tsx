@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import {
@@ -116,11 +117,13 @@ export default async function ProductPage({ params }: PageProps) {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <script
+    <>
+      <Script
+        id="product-jsonld"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
       <Breadcrumb
         items={[
@@ -233,5 +236,6 @@ export default async function ProductPage({ params }: PageProps) {
         </div>
       )}
     </div>
+    </>
   );
 }

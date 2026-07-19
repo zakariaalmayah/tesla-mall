@@ -13,9 +13,7 @@ export interface AuthActionResult {
   error?: "INVALID_INPUT" | "INVALID_CREDENTIALS" | "PHONE_TAKEN" | "GENERIC";
 }
 
-function normalizePhone(phone: string): string {
-  return phone.startsWith("+") ? phone : `+${phone}`;
-}
+import { normalizePhone } from "@/lib/utils";
 
 export async function loginAction(input: LoginInput, locale: Locale): Promise<AuthActionResult> {
   const parsed = loginSchema.safeParse(input);

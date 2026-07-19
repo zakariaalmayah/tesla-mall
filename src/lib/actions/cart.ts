@@ -19,6 +19,47 @@ export interface CartActionResult {
   cartItemCount?: number;
 }
 
+import { cookies } from "next/headers";
+import { nanoid } from "nanoid";
+
+async function getCartUserId(): Promise<string> {
+  const session = await auth();
+  if (session?.user?.id) {
+    return session.user.id;
+  }
+
+  const cookieStore = await cookies();
+  let guestUserId = cookieStore.get("guest_user_id")?.value;
+
+  if (guestUserId) {
+    const userExists = await prisma.user.findUnique({ where: { id: guestUserId } });
+    if (!userExists) {
+      guestUserId = undefined;
+    }
+  }
+
+  if (!guestUserId) {
+    guestUserId = `guest_${nanoid(16)}`;
+    cookieStore.set("guest_user_id", guestUserId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      path: "/",
+    });
+
+    await prisma.user.create({
+      data: {
+        id: guestUserId,
+        name: "Guest",
+        phone: guestUserId,
+        role: "CUSTOMER",
+      },
+    });
+  }
+
+  return guestUserId;
+}
+
 async function getOrCreateCartId(userId: string): Promise<string> {
   const cart = await prisma.cart.upsert({
     where: { userId },
@@ -30,10 +71,7 @@ async function getOrCreateCartId(userId: string): Promise<string> {
 }
 
 export async function addToCartAction(input: AddToCartInput): Promise<CartActionResult> {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return { ok: false, error: "UNAUTHENTICATED" };
-  }
+  const userId = await getCartUserId();
 
   const parsed = addToCartSchema.safeParse(input);
   if (!parsed.success) {
@@ -61,7 +99,7 @@ export async function addToCartAction(input: AddToCartInput): Promise<CartAction
     return { ok: false, error: "OUT_OF_STOCK" };
   }
 
-  const cartId = await getOrCreateCartId(session.user.id);
+  const cartId = await getOrCreateCartId(userId);
 
   const existingItem = await prisma.cartItem.findFirst({
     where: {
@@ -105,8 +143,7 @@ const updateQuantitySchema = z.object({
 export async function updateCartItemQuantityAction(
   input: z.infer<typeof updateQuantitySchema>,
 ): Promise<CartActionResult> {
-  const session = await auth();
-  if (!session?.user?.id) return { ok: false, error: "UNAUTHENTICATED" };
+  const userId = await getCartUserId();
 
   const parsed = updateQuantitySchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "INVALID_INPUT" };
@@ -115,7 +152,7 @@ export async function updateCartItemQuantityAction(
     where: { id: parsed.data.cartItemId },
     select: { cart: { select: { userId: true } } },
   });
-  if (!item || item.cart.userId !== session.user.id) {
+  if (!item || item.cart.userId !== userId) {
     return { ok: false, error: "NOT_FOUND" };
   }
 
@@ -129,14 +166,13 @@ export async function updateCartItemQuantityAction(
 }
 
 export async function removeCartItemAction(cartItemId: string): Promise<CartActionResult> {
-  const session = await auth();
-  if (!session?.user?.id) return { ok: false, error: "UNAUTHENTICATED" };
+  const userId = await getCartUserId();
 
   const item = await prisma.cartItem.findUnique({
     where: { id: cartItemId },
     select: { cart: { select: { userId: true } } },
   });
-  if (!item || item.cart.userId !== session.user.id) {
+  if (!item || item.cart.userId !== userId) {
     return { ok: false, error: "NOT_FOUND" };
   }
 

@@ -66,7 +66,7 @@ export default async function AdminOrdersPage({ params, searchParams }: PageProp
 
       <div className="overflow-x-auto rounded-2xl border border-border bg-background">
         <table className="w-full text-sm">
-          <thead className="bg-secondary/60 text-xs uppercase text-muted-foreground">
+          <thead className="bg-secondary/60 text-xs uppercase ">
             <tr>
               <th className="px-4 py-3 text-start font-medium">{t("orderNumber")}</th>
               <th className="px-4 py-3 text-start font-medium">{t("customer")}</th>
