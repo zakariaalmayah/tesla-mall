@@ -10,59 +10,74 @@ import { siteConfig } from "@/config/site";
 export const revalidate = 60;
 
 async function getFeaturedCategories() {
-  return prisma.category.findMany({
-    where: { isActive: true, parentId: null },
-    orderBy: { sortOrder: "asc" },
-    take: 8,
-  });
+  try {
+    return await prisma.category.findMany({
+      where: { isActive: true, parentId: null },
+      orderBy: { sortOrder: "asc" },
+      take: 8,
+    });
+  } catch (error) {
+    console.error("Failed to fetch featured categories:", error);
+    return [];
+  }
 }
 
 async function getBestSellers(): Promise<ProductCardData[]> {
-  const products = await prisma.product.findMany({
-    where: { status: "ACTIVE" },
-    orderBy: { soldCount: "desc" },
-    take: 8,
-    include: { media: { orderBy: { sortOrder: "asc" }, take: 1 } },
-  });
+  try {
+    const products = await prisma.product.findMany({
+      where: { status: "ACTIVE" },
+      orderBy: { soldCount: "desc" },
+      take: 8,
+      include: { media: { orderBy: { sortOrder: "asc" }, take: 1 } },
+    });
 
-  return products.map((p) => ({
-    id: p.id,
-    slug: p.slug,
-    nameAr: p.nameAr,
-    nameEn: p.nameEn,
-    price: Number(p.price),
-    compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : null,
-    image: p.media[0]?.url ?? null,
-    ratingAverage: p.ratingAverage,
-    ratingCount: p.ratingCount,
-    quantity: p.quantity,
-    trackInventory: p.trackInventory,
-    allowBackorder: p.allowBackorder,
-  }));
+    return products.map((p) => ({
+      id: p.id,
+      slug: p.slug,
+      nameAr: p.nameAr,
+      nameEn: p.nameEn,
+      price: Number(p.price),
+      compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : null,
+      image: p.media[0]?.url ?? null,
+      ratingAverage: p.ratingAverage,
+      ratingCount: p.ratingCount,
+      quantity: p.quantity,
+      trackInventory: p.trackInventory,
+      allowBackorder: p.allowBackorder,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch best sellers:", error);
+    return [];
+  }
 }
 
 async function getNewArrivals(): Promise<ProductCardData[]> {
-  const products = await prisma.product.findMany({
-    where: { status: "ACTIVE", isNewArrival: true },
-    orderBy: { createdAt: "desc" },
-    take: 8,
-    include: { media: { orderBy: { sortOrder: "asc" }, take: 1 } },
-  });
+  try {
+    const products = await prisma.product.findMany({
+      where: { status: "ACTIVE", isNewArrival: true },
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      include: { media: { orderBy: { sortOrder: "asc" }, take: 1 } },
+    });
 
-  return products.map((p) => ({
-    id: p.id,
-    slug: p.slug,
-    nameAr: p.nameAr,
-    nameEn: p.nameEn,
-    price: Number(p.price),
-    compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : null,
-    image: p.media[0]?.url ?? null,
-    ratingAverage: p.ratingAverage,
-    ratingCount: p.ratingCount,
-    quantity: p.quantity,
-    trackInventory: p.trackInventory,
-    allowBackorder: p.allowBackorder,
-  }));
+    return products.map((p) => ({
+      id: p.id,
+      slug: p.slug,
+      nameAr: p.nameAr,
+      nameEn: p.nameEn,
+      price: Number(p.price),
+      compareAtPrice: p.compareAtPrice ? Number(p.compareAtPrice) : null,
+      image: p.media[0]?.url ?? null,
+      ratingAverage: p.ratingAverage,
+      ratingCount: p.ratingCount,
+      quantity: p.quantity,
+      trackInventory: p.trackInventory,
+      allowBackorder: p.allowBackorder,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch new arrivals:", error);
+    return [];
+  }
 }
 
 export default async function HomePage({
