@@ -57,12 +57,6 @@ export function AddToCartForm({
   const inStock = !trackInventory || effectiveQuantity > 0 || allowBackorder;
 
   function handleAddToCart() {
-    if (!isAuthenticated) {
-      toast.message(t("signInToAdd"));
-      router.push("/login");
-      return;
-    }
-
     startTransition(async () => {
       const result = await addToCartAction({
         productId,

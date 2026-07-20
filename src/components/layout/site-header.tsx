@@ -7,8 +7,39 @@ import { siteConfig } from "@/config/site";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
+import { auth } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
 export async function SiteHeader() {
   const t = await getTranslations("nav");
+
+  const session = await auth();
+  let cartUserId = session?.user?.id;
+  if (!cartUserId) {
+    const { cookies } = await import("next/headers");
+    const cookieStore = await cookies();
+    cartUserId = cookieStore.get("guest_user_id")?.value;
+  }
+
+  let cartCount = 0;
+  if (cartUserId) {
+    try {
+      const cart = await prisma.cart.findUnique({
+        where: { userId: cartUserId },
+        select: {
+          items: {
+            select: { quantity: true },
+          },
+        },
+      });
+      if (cart) {
+        cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+      }
+    } catch {
+      // If DB is unreachable, silently show 0 so the page still renders
+      cartCount = 0;
+    }
+  }
 
   const navItems = [
     { key: "electronics", href: "/categories/electronics" },
@@ -76,6 +107,11 @@ export async function SiteHeader() {
             aria-label={t("cart")}
           >
             <ShoppingCart className="size-5" />
+            {cartCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-gold-600 text-[10px] font-bold text-white ring-2 ring-background transition-transform duration-300">
+                {cartCount}
+              </span>
+            )}
           </Link>
         </nav>
       </div>

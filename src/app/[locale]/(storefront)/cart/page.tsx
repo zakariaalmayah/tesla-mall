@@ -25,9 +25,15 @@ export default async function CartPage({ params }: PageProps) {
   const t = await getTranslations({ locale, namespace: "cart" });
   const tNav = await getTranslations({ locale, namespace: "nav" });
   const session = await auth();
+  let cartUserId = session?.user?.id;
+  if (!cartUserId) {
+    const { cookies } = await import("next/headers");
+    const cookieStore = await cookies();
+    cartUserId = cookieStore.get("guest_user_id")?.value;
+  }
 
-  const cart = session?.user?.id
-    ? await getCartForUser(session.user.id)
+  const cart = cartUserId
+    ? await getCartForUser(cartUserId)
     : { cartId: null, items: [], subtotal: 0, itemCount: 0 };
 
   return (

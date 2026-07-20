@@ -7,10 +7,12 @@ import { z } from "zod";
 
 import { prisma } from "@/lib/prisma";
 
+import { normalizePhone } from "@/lib/utils";
+
 const credentialsSchema = z.object({
   phone: z
     .string()
-    .regex(/^\+?9677\d{8}$/, "رقم هاتف يمني غير صحيح"),
+    .regex(/^(?:\+?967|0)?7\d{8}$/, "رقم هاتف يمني غير صحيح"),
   password: z.string().min(8),
 });
 
@@ -32,7 +34,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!parsed.success) return null;
 
         const { phone, password } = parsed.data;
-        const normalizedPhone = phone.startsWith("+") ? phone : `+${phone}`;
+        const normalizedPhone = normalizePhone(phone);
 
         const user = await prisma.user.findUnique({
           where: { phone: normalizedPhone },

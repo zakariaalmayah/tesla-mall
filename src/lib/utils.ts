@@ -62,3 +62,20 @@ export function slugify(input: string): string {
     .replace(/[^\w\u0600-\u06FF-]+/g, "")
     .replace(/-+/g, "-");
 }
+
+export function normalizePhone(phone: string): string {
+  const cleaned = phone.trim().replace(/\s+/g, "");
+  if (cleaned.startsWith("+967")) {
+    return cleaned;
+  }
+  if (cleaned.startsWith("00967")) {
+    return "+" + cleaned.slice(2);
+  }
+  if (cleaned.startsWith("07") && cleaned.length === 10) {
+    return `+967${cleaned.slice(1)}`;
+  }
+  if (cleaned.startsWith("7") && cleaned.length === 9) {
+    return `+967${cleaned}`;
+  }
+  return cleaned.startsWith("+") ? cleaned : `+${cleaned}`;
+}

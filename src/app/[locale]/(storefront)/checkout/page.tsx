@@ -24,13 +24,20 @@ export default async function CheckoutPage({ params }: PageProps) {
   const tNav = await getTranslations({ locale, namespace: "nav" });
 
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect({ href: "/login", locale });
+  let cartUserId = session?.user?.id;
+  if (!cartUserId) {
+    const { cookies } = await import("next/headers");
+    const cookieStore = await cookies();
+    cartUserId = cookieStore.get("guest_user_id")?.value;
+  }
+
+  if (!cartUserId) {
+    redirect({ href: "/cart", locale });
   }
 
   const [cart, addresses, shippingZones] = await Promise.all([
-    getCartForUser(session!.user.id),
-    getUserAddresses(session!.user.id),
+    getCartForUser(cartUserId!),
+    session?.user?.id ? getUserAddresses(session.user.id) : Promise.resolve([]),
     getActiveShippingZones(),
   ]);
 

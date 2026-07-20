@@ -62,7 +62,7 @@ export function CatalogPagination({
               "flex size-10 items-center justify-center rounded-lg text-sm font-medium transition-colors",
               page === currentPage
                 ? "bg-gold-gradient text-ink-950"
-                : "text-foreground hover:bg-secondary",
+                : "text-foreground hover:bg-secondary hover:text-secondary-foreground",
             )}
           >
             {page}
@@ -98,7 +98,7 @@ function PageLink({
   return (
     <a
       href={href}
-      className="flex size-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-secondary"
+      className="flex size-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-secondary hover:text-secondary-foreground"
       {...props}
     >
       {children}

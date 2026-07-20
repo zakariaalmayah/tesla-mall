@@ -1,3 +1,9 @@
+اول شي شغل المشروع
+npm run dev
+
+
+
+
 # Tesla Mall — متجر تسلا مول
 
 Premium multi-category e-commerce platform for Yemen. Arabic-first (RTL), English secondary (LTR).
