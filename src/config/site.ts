@@ -18,7 +18,7 @@ export const siteConfig = {
   },
   social: {
     facebook: "https://facebook.com/teslamall",
-    instagram: "https://instagram.com/teslamall",
+    instagram: "https://www.instagram.com/tesla_mall_store?igsh=N290eDdzZW51bTly",
     tiktok: "https://tiktok.com/@teslamall",
   },
   categories: [
